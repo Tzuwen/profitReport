@@ -1,0 +1,24 @@
+﻿<Window x:Class="profitReport.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:profitReport"
+        mc:Ignorable="d"
+        Title="流水帳系統" Height="350" Width="525">
+    <Grid Background="LightGray">
+        <StackPanel Orientation="Vertical" Margin="0,10,0,0">
+            <Label Name="lbMsg">請選擇目錄</Label>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                <Label>目錄：</Label>
+                <TextBox Name="tbShowPath" Width="300"></TextBox>                
+                <Button Name="btnGetFolder" Width="70" Click="btnGetFolder_Click">選擇...</Button>
+                <Button Name="btnGo" Width="70" Click="btnGo_Click">產生流水帳</Button>
+            </StackPanel>
+            <ScrollViewer Name="svMsg" Height="240" Margin="5,5,5,5" VerticalScrollBarVisibility="Auto">
+                <TextBlock Name="tbShowMsg" Height="Auto" Width="Auto" Background="White" TextWrapping="Wrap"/>
+            </ScrollViewer>
+            
+        </StackPanel>
+    </Grid>
+</Window>
