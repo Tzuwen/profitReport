@@ -18,7 +18,7 @@ namespace profitReport
         private static DataTable dtResult;
         public MainWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
         }
 
         private void btnGetFolder_Click(object sender, RoutedEventArgs e)
@@ -83,7 +83,7 @@ namespace profitReport
                     if (sheetName.Length >= 4 && sheetName.Substring(sheetName.Length - 4, 2) == "PO")
                         ProcessSheet(path, sheetName);
                 }
-                dtExcelSchema = null;                               
+                dtExcelSchema = null;
             }
         }
 
@@ -137,61 +137,75 @@ namespace profitReport
             {
                 // 
                 string[] productCodeArray = (sheet.GetRow(productCodeArrayRow).GetCell(productCodeArrayColume).StringCellValue).Split(' ');// (3,0)
-                string productCode = productCodeArray[0]; // 品項(產品編號)                
-                string productCodeMinor = sheet.GetRow(productCodeMinorRow).GetCell(productCodeMinorColumn).StringCellValue; // 細項(產品編號), (2,3)
-                for (int j = 4; j < 12; j++)
+                if (productCodeArray[0] != "")
                 {
-                    string nextProductCodeMinor = sheet.GetRow(productCodeMinorRow).GetCell(j).StringCellValue;
-                    if (nextProductCodeMinor != "")
-                        productCodeMinor += "+" + nextProductCodeMinor;
-                }
-                string customerProductCode = productCodeArray.Length == 2 ? productCodeArray[1] : ""; // 客戶品項編號
-                string package = sheet.GetRow(packageRowA).GetCell(packageColumn).StringCellValue
-                    + (sheet.GetRow(packageRowB).GetCell(packageColumn).StringCellValue == "" ? "" : " + " + sheet.GetRow(packageRowB).GetCell(packageColumn).StringCellValue); // 包材/包裝方式, (3,27) + (4,27)
-                string boxes = Convert.ToInt32(sheet.GetRow(boxesRowA).GetCell(boxesColumn).NumericCellValue).ToString() + "/" + Convert.ToInt32(sheet.GetRow(boxesRowB).GetCell(boxesColumn).NumericCellValue).ToString(); // 裝箱數, (6,2) + "/" + (7,2)
-                //
-                int quantity = Convert.ToInt32(sheet.GetRow(quantityRow).GetCell(quantityColumn).NumericCellValue); // 製單數量, (12,36)
-                decimal basePrice = Math.Round(Convert.ToDecimal(sheet.GetRow(basePriceRow).GetCell(priceColumn).NumericCellValue), 2); // 底價, (8,34)
-                decimal suggestPrice = Math.Round(Convert.ToDecimal(sheet.GetRow(suggestPriceRow).GetCell(priceColumn).NumericCellValue), 2); // 建議報價, (9,34)
-                decimal salesPrice = Math.Round(Convert.ToDecimal(sheet.GetRow(salesPriceRow).GetCell(priceColumn).NumericCellValue), 2); // 業務報價, (10,34)
-                decimal projectPrice = Math.Round(Convert.ToDecimal(sheet.GetRow(projectPriceRow).GetCell(priceColumn).NumericCellValue), 2); // 專案價格, (12,34)
-                string priceOrigin = ""; // 單價(原), null
-                string price = ""; // 單價, null
-                string totalOrigin = ""; // 應收金額(原), null
-                string total = ""; // 應收金額, null
-                string tax = ""; // 應收稅額, null
-                string totalCost = ""; // 總成本, null
-                string profit = ""; // 利潤, null
-                string remark = ""; // 備註, null
+                    try
+                    {
+                        string productCode = productCodeArray[0]; // 品項(產品編號)                
+                        string productCodeMinor = sheet.GetRow(productCodeMinorRow).GetCell(productCodeMinorColumn).StringCellValue; // 細項(產品編號), (2,3)
+                        for (int j = 4; j < 12; j++)
+                        {
+                            string nextProductCodeMinor = sheet.GetRow(productCodeMinorRow).GetCell(j).StringCellValue;
+                            if (nextProductCodeMinor != "")
+                                productCodeMinor += "+" + nextProductCodeMinor;
+                        }
+                        string customerProductCode = productCodeArray.Length == 2 ? productCodeArray[1] : ""; // 客戶品項編號
+                        string package = sheet.GetRow(packageRowA).GetCell(packageColumn).StringCellValue
+                            + (sheet.GetRow(packageRowB).GetCell(packageColumn).StringCellValue == "" ? "" : " + " + sheet.GetRow(packageRowB).GetCell(packageColumn).StringCellValue); // 包材/包裝方式, (3,27) + (4,27)
+                                                                                                                                                                                        //string boxes = Convert.ToInt32(sheet.GetRow(boxesRowA).GetCell(boxesColumn).NumericCellValue).ToString() + "/" + Convert.ToInt32(sheet.GetRow(boxesRowB).GetCell(boxesColumn).NumericCellValue).ToString(); // 裝箱數, (6,2) + "/" + (7,2)
+                        sheet.GetRow(boxesRowA).GetCell(boxesColumn).SetCellType(CellType.String);
+                        sheet.GetRow(boxesRowB).GetCell(boxesColumn).SetCellType(CellType.String);
+                        string boxes = sheet.GetRow(boxesRowA).GetCell(boxesColumn).StringCellValue + "/" + sheet.GetRow(boxesRowB).GetCell(boxesColumn).StringCellValue; // 裝箱數, (6,2) + "/" + (7,2)
+                                                                                                                                                                          //
+                        int quantity = Convert.ToInt32(sheet.GetRow(quantityRow).GetCell(quantityColumn).NumericCellValue); // 製單數量, (12,36)
+                        decimal basePrice = Math.Round(Convert.ToDecimal(sheet.GetRow(basePriceRow).GetCell(priceColumn).NumericCellValue), 2); // 底價, (8,34)
+                        decimal suggestPrice = Math.Round(Convert.ToDecimal(sheet.GetRow(suggestPriceRow).GetCell(priceColumn).NumericCellValue), 2); // 建議報價, (9,34)
+                        decimal salesPrice = Math.Round(Convert.ToDecimal(sheet.GetRow(salesPriceRow).GetCell(priceColumn).NumericCellValue), 2); // 業務報價, (10,34)
+                        decimal projectPrice = Math.Round(Convert.ToDecimal(sheet.GetRow(projectPriceRow).GetCell(priceColumn).NumericCellValue), 2); // 專案價格, (12,34)
+                        string priceOrigin = ""; // 單價(原), null
+                        string price = ""; // 單價, null
+                        string totalOrigin = ""; // 應收金額(原), null
+                        string total = ""; // 應收金額, null
+                        string tax = ""; // 應收稅額, null
+                        string totalCost = ""; // 總成本, null
+                        string profit = ""; // 利潤, null
+                        string remark = ""; // 備註, null
 
-                // Write to datatable
-                WriteToDt(soldNumber, soldDate, purchaseOrder, customerPo, customerCode, salesName, customerName,
-                    soldTo, productCode, productCodeMinor, customerProductCode, package, boxes,
-                    rate, term, currency, quantity, basePrice, suggestPrice, salesPrice, projectPrice,
-                    priceOrigin, price, totalOrigin, total, tax, totalCost, profit, remark
+                        // Write to datatable
+                        WriteToDt(soldNumber, soldDate, purchaseOrder, customerPo, customerCode, salesName, customerName,
+                            soldTo, productCode, productCodeMinor, customerProductCode, package, boxes,
+                            rate, term, currency, quantity, basePrice, suggestPrice, salesPrice, projectPrice,
+                            priceOrigin, price, totalOrigin, total, tax, totalCost, profit, remark
 
-                   );
+                           );
 
-                if (i != 2)
-                {
-                    // row + 12
-                    productCodeArrayRow += rowAdd12;
-                    productCodeMinorRow += rowAdd12;
-                    packageRowA += rowAdd12; packageRowB += rowAdd12;
-                    boxesRowA += rowAdd12; boxesRowB += rowAdd12;
-                    quantityRow += rowAdd12;
-                    basePriceRow += rowAdd12; suggestPriceRow += rowAdd12; salesPriceRow += rowAdd12; projectPriceRow += rowAdd12;
-                }
-                else
-                {
-                    // row + 18
-                    // 跳過簽核欄位共六欄，所以比一般多加六行
-                    productCodeArrayRow += rowAdd18;
-                    productCodeMinorRow += rowAdd18;
-                    packageRowA += rowAdd18; packageRowB += rowAdd18;
-                    boxesRowA += rowAdd18; boxesRowB += rowAdd18;
-                    quantityRow += rowAdd18;
-                    basePriceRow += rowAdd18; suggestPriceRow += rowAdd18; salesPriceRow += rowAdd18; projectPriceRow += rowAdd18;
+                        if (i != 2)
+                        {
+                            // row + 12
+                            productCodeArrayRow += rowAdd12;
+                            productCodeMinorRow += rowAdd12;
+                            packageRowA += rowAdd12; packageRowB += rowAdd12;
+                            boxesRowA += rowAdd12; boxesRowB += rowAdd12;
+                            quantityRow += rowAdd12;
+                            basePriceRow += rowAdd12; suggestPriceRow += rowAdd12; salesPriceRow += rowAdd12; projectPriceRow += rowAdd12;
+                        }
+                        else
+                        {
+                            // row + 18
+                            // 跳過簽核欄位共六欄，所以比一般多加六行
+                            productCodeArrayRow += rowAdd18;
+                            productCodeMinorRow += rowAdd18;
+                            packageRowA += rowAdd18; packageRowB += rowAdd18;
+                            boxesRowA += rowAdd18; boxesRowB += rowAdd18;
+                            quantityRow += rowAdd18;
+                            basePriceRow += rowAdd18; suggestPriceRow += rowAdd18; salesPriceRow += rowAdd18; projectPriceRow += rowAdd18;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.Forms.MessageBox.Show(ex.ToString(), "Message");
+                    }
+                    finally { }
                 }
             }
         }
