@@ -55,7 +55,7 @@ namespace profitReport
                     }
                     DataTableToExcelFile(dtResult, path + "\\");
                     dtResult = null;
-                    SendMsg("流水帳已完成，共匯入 " + filesCount.ToString() + " 筆檔案");
+                    SendMsg("共處理 " + filesCount.ToString() + " 筆檔案");
                     this.svMsg.ScrollToBottom();
                 }
                 else
@@ -68,8 +68,12 @@ namespace profitReport
         // Do somthing with each excel file.
         private void ProcessFile(string path)
         {
-            string fileName = Path.GetFileName(path);
-            SendMsg("已匯入檔案：" + fileName);           
+            string functionType = "PO";
+            int sheetCount = 0;
+            if (rbTypeTo.IsChecked == true)
+                functionType = "總表";
+
+            string fileName = Path.GetFileName(path);                    
             string ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;";
 
             using (OleDbConnection conn = new OleDbConnection(ConnectionString))
@@ -80,10 +84,14 @@ namespace profitReport
                 foreach (DataRow dr in dtExcelSchema.Rows)
                 {
                     string sheetName = dr["TABLE_NAME"].ToString();
-                    if (sheetName.Length >= 4 && sheetName.Substring(sheetName.Length - 4, 2) == "PO")
+                    if (sheetName.Length >= 4 && sheetName.Substring(sheetName.Length - 4, 2).ToUpper() == functionType)
+                    {
                         ProcessSheet(path, sheetName);
+                        sheetCount++;
+                    }
                 }
-                dtExcelSchema = null;
+                dtExcelSchema = null;               
+                SendMsg("檔案：" + fileName + " 有 " + sheetCount + " 張" + functionType + "表單");
             }
         }
 
@@ -252,42 +260,50 @@ namespace profitReport
             dtResult.Rows.Add(dtRow);
         }
 
-        private static void DataTableToExcelFile(DataTable dt, string path)
+        private void DataTableToExcelFile(DataTable dt, string path)
         {
             IWorkbook wb = new XSSFWorkbook();
             ISheet ws;
-
-            if (dt.TableName != string.Empty)
-                ws = wb.CreateSheet(dt.TableName);
-            else
-                ws = wb.CreateSheet("Sheet1");
-
-            ws.CreateRow(0);// Create row 1 for column name
-            for (int i = 0; i < dt.Columns.Count; i++)
+            if (dt.Rows.Count > 1)
             {
-                ws.GetRow(0).CreateCell(i).SetCellValue(dt.Columns[i].ColumnName);
-            }
+                if (dt.TableName != string.Empty)
+                    ws = wb.CreateSheet(dt.TableName);
+                else
+                    ws = wb.CreateSheet("Sheet1");
 
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                ws.CreateRow(i + 1);
-                for (int j = 0; j < dt.Columns.Count; j++)
+                ws.CreateRow(0);// Create row 1 for column name
+                for (int i = 0; i < dt.Columns.Count; i++)
                 {
-                    ws.GetRow(i + 1).CreateCell(j).SetCellValue(dt.Rows[i][j].ToString());
+                    ws.GetRow(0).CreateCell(i).SetCellValue(dt.Columns[i].ColumnName);
+                }
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    ws.CreateRow(i + 1);
+                    for (int j = 0; j < dt.Columns.Count; j++)
+                    {
+                        ws.GetRow(i + 1).CreateCell(j).SetCellValue(dt.Rows[i][j].ToString());
+                    }
+                }
+                string date = DateTime.Now.Date.Year.ToString() + DateTime.Now.Date.Month.ToString() + DateTime.Now.Date.Day.ToString();
+                try
+                {
+                    FileStream file;
+                    if (rbTypePo.IsChecked == true)
+                        file = new FileStream(path + "PO流水帳_系統產出_" + date + ".xlsx", FileMode.Create);
+                    else
+                        file = new FileStream(path + "總表流水帳_系統產出_" + date + ".xlsx", FileMode.Create);
+                    wb.Write(file);
+                    file.Close();
+                    dt = null;
+                }
+                catch
+                {
+                    System.Windows.Forms.MessageBox.Show("無法儲存檔案", "Message");
                 }
             }
-            string date = DateTime.Now.Date.Year.ToString() + DateTime.Now.Date.Month.ToString() + DateTime.Now.Date.Day.ToString();
-            try
-            {
-                FileStream file = new FileStream(path + "流水帳_系統產出_" + date + ".xlsx", FileMode.Create);
-                wb.Write(file);
-                file.Close();
-                dt = null;
-            }
-            catch
-            {
-                System.Windows.Forms.MessageBox.Show("無法儲存檔案", "Message");
-            }
+            else
+                System.Windows.Forms.MessageBox.Show("無資料", "Message");
         }
 
         private void SendMsg(string msg)
