@@ -264,7 +264,7 @@ namespace profitReport
         {
             IWorkbook wb = new XSSFWorkbook();
             ISheet ws;
-            if (dt.Rows.Count > 1)
+            if (dt.Rows.Count > 0)
             {
                 if (dt.TableName != string.Empty)
                     ws = wb.CreateSheet(dt.TableName);
