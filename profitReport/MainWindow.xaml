@@ -10,14 +10,13 @@
         <StackPanel Orientation="Vertical" Margin="0,10,0,0">
             <StackPanel Orientation="Horizontal">
                 <RadioButton Name="rbTypePo" Content="PO" GroupName="type" IsChecked="True"/>
-                <RadioButton Name="rbTypeTo" Content="總表" GroupName="type"/>
-            </StackPanel>
-            
+                <RadioButton Name="rbTypeTo" Content="總表" GroupName="type" Margin="20,0,0,0"/>
+            </StackPanel>            
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
                 <Label>目錄：</Label>
                 <TextBox Name="tbShowPath" Width="300"></TextBox>                
                 <Button Name="btnGetFolder" Width="70" Click="btnGetFolder_Click">選擇...</Button>
-                <Button Name="btnGo" Width="70" Click="btnGo_Click">產生流水帳</Button>
+                <Button Name="btnGo" Width="70" Click="btnGo_Click">產生流水帳</Button>                
             </StackPanel>
             <ScrollViewer Name="svMsg" Height="240" Margin="5,5,5,5" VerticalScrollBarVisibility="Auto">
                 <TextBlock Name="tbShowMsg" Height="Auto" Width="Auto" Background="White" TextWrapping="Wrap"/>
