@@ -41,7 +41,7 @@ namespace profitReport
         private void btnGo_Click(object sender, RoutedEventArgs e)
         {
             string path = this.tbShowPath.Text.Trim();
-            if (path == "")
+            if (string.IsNullOrWhiteSpace(path))
                 System.Windows.Forms.MessageBox.Show("請先選擇目錄", "Message");
             else
             {
@@ -186,7 +186,7 @@ namespace profitReport
             {
                 // 
                 string[] productIdArray = (sheet.GetRow(productIdArrayRow).GetCell(productIdArrayColume).StringCellValue).Split(' ');// (3,0)
-                if (productIdArray[0] != "")
+                if (!string.IsNullOrWhiteSpace(productIdArray[0].ToString()))
                 {
                     try
                     {
@@ -197,7 +197,7 @@ namespace profitReport
                         {
                             sheet.GetRow(productIdMinorRow).GetCell(j).SetCellType(CellType.String);
                             string nextProductIdMinor = sheet.GetRow(productIdMinorRow).GetCell(j).StringCellValue;
-                            if (nextProductIdMinor != "")
+                            if (!string.IsNullOrWhiteSpace(nextProductIdMinor))
                                 productIdMinor += "+" + nextProductIdMinor;
                         }
                         string customerProductId = productIdArray.Length == 2 ? productIdArray[1] : ""; // 客戶品項編號

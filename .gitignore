@@ -169,9 +169,6 @@ rcf/
 # Microsoft Azure ApplicationInsights config file
 ApplicationInsights.config
 
-# Microsoft ApplicationInsights config file
-App.config
-
 # Windows Store app package directory
 AppPackages/
 BundleArtifacts/
@@ -246,3 +243,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+App.config
